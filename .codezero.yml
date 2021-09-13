@@ -1,0 +1,23 @@
+lang:
+  java: 8 #the global lang and version
+events: #if omitted then every event fires the build
+  git_branch: any
+# ops are unordered logical groupings of functionality that can (eventually) be run locally or remotely
+ops: #if omitted than a default build is executed based on language
+  setup:
+    - terraform:
+        path: ''
+        script: |
+          sudo apt-get install -y unzip
+          curl -g https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip -o /tmp/terraform.zip
+          sudo unzip /tmp/terraform.zip -d /usr/bin
+  validate:
+    - tf-build-tools:
+        script: ./mvnw clean test
+stages:
+  - setup:
+      ops:
+        - setup.terraform
+  - build:
+      ops:
+        - validate
